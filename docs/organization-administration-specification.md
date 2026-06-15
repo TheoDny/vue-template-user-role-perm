@@ -46,7 +46,7 @@ The NestJS backend does not define a global prefix for custom controllers. Bette
 | `POST` | `/auth/logout` | Sign out current session | none |
 | `GET` | `/auth/authenticated` | Check if a session exists | none |
 | `GET` | `/auth/session` | Get custom session, permissions, roles, and organizations | none |
-| `POST` | `/api/auth/organization/set-active` | Set active organization for the current session | `{ organizationId }` |
+| `POST` | `/auth/active-organization` | Set active organization for the current session | `{ organizationId?: string | null, organizationSlug?: string }` |
 
 ### Permissions
 
@@ -134,7 +134,7 @@ Required service modules:
 | `src/services/api.service.ts` | Shared HTTP client, JSON parsing, credentials, base URL, error normalization |
 | `src/services/auth.service.ts` | `login`, `signOut`, `getAuthenticated` |
 | `src/services/session.service.ts` | `getSession`, refresh current user permissions and organizations |
-| `src/services/organization.service.ts` | `setActiveOrganization` through Better Auth |
+| `src/services/organization.service.ts` | `setActiveOrganization` through the custom Nest auth route |
 | `src/services/permission.service.ts` | `listPermissions`, `checkPermissions` |
 | `src/services/organization-role.service.ts` | `listRoles`, `createRole`, `updateRoleName`, `updateRolePermissions`, `deleteRole` |
 | `src/services/organization-member.service.ts` | `listMembers`, `updateMemberRoles`, `deleteMember` |
