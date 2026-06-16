@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router"
-import { isApiError } from "@/services/api.service"
 import { useSessionStore } from "@/stores/session.store"
 import type { Permission } from "@/types/permission.type"
 
@@ -71,10 +70,8 @@ router.beforeEach(async (to) => {
   if (!sessionStore.loaded && (to.meta.requiresAuth || to.meta.permission || to.meta.guestOnly)) {
     try {
       await sessionStore.refreshSession()
-    } catch (error) {
-      if (!isApiError(error) || error.status !== 401) {
-        console.error(error)
-      }
+    } catch {
+      sessionStore.clearSession()
     }
   }
 
@@ -92,4 +89,3 @@ router.beforeEach(async (to) => {
 
   return true
 })
-
