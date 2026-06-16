@@ -71,6 +71,14 @@ onMounted(async () => {
   draftPermissions.value = clonePermissions(rolesAdmin.selectedPermissions.value)
 })
 
+watch(
+  () => sessionStore.activeOrganizationId,
+  async () => {
+    await rolesAdmin.refresh()
+    draftPermissions.value = clonePermissions(rolesAdmin.selectedPermissions.value)
+  },
+)
+
 function clonePermissions(permissions: PermissionMatrix): PermissionMatrix {
   return Object.fromEntries(
     Object.entries(permissions).map(([resource, actions]) => [resource, [...new Set(actions)]]),

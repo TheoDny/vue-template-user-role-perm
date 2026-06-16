@@ -17,33 +17,17 @@ import {
 } from "@/components/ui/sidebar"
 import OrganizationSwitcher from "@/components/layout/OrganizationSwitcher.vue"
 import NavUser from "@/components/layout/NavUser.vue"
+import { getVisibleAdministrationItems } from "@/lib/admin-navigation"
 import { useSessionStore } from "@/stores/session.store"
-import type { Permission } from "@/types/permission.type"
 
 const route = useRoute()
 const sessionStore = useSessionStore()
 
 const administrationItems = computed(() =>
-  [
-    {
-      label: "Roles",
-      route: "/admin/roles",
-      permission: "ac:read" as Permission,
-      icon: ShieldCheck,
-    },
-    {
-      label: "Members",
-      route: "/admin/members",
-      permission: "member:read" as Permission,
-      icon: Users,
-    },
-    {
-      label: "Invitations",
-      route: "/admin/invitations",
-      permission: "invitation:read" as Permission,
-      icon: Mail,
-    },
-  ].filter((item) => sessionStore.hasPermission(item.permission)),
+  getVisibleAdministrationItems(sessionStore.hasPermission).map((item) => ({
+    ...item,
+    icon: item.routeName === "admin-roles" ? ShieldCheck : item.routeName === "admin-members" ? Users : Mail,
+  })),
 )
 </script>
 
@@ -101,4 +85,3 @@ const administrationItems = computed(() =>
     </SidebarFooter>
   </Sidebar>
 </template>
-

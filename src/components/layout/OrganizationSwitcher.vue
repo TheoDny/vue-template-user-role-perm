@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from "vue"
+import { useRoute, useRouter } from "vue-router"
 import { toast } from "vue-sonner"
 import {
   Select,
@@ -10,9 +11,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { isApiError } from "@/services/api.service"
+import { getFirstAllowedAdministrationRouteName } from "@/lib/admin-navigation"
 import { useSessionStore } from "@/stores/session.store"
 
 const sessionStore = useSessionStore()
+const route = useRoute()
+const router = useRouter()
 const pending = ref(false)
 
 const selectedOrganizationId = computed({
@@ -31,6 +35,11 @@ async function handleOrganizationChange(organizationId: string) {
 
   try {
     await sessionStore.setActiveOrganization(organizationId)
+    const routePermission = route.meta.permission
+
+    if (routePermission && !sessionStore.hasPermission(routePermission)) {
+      await router.replace({ name: getFirstAllowedAdministrationRouteName(sessionStore.hasPermission) })
+    }
   } catch (error) {
     toast.error(isApiError(error) ? error.message : "Unable to switch organization")
   } finally {
@@ -60,4 +69,3 @@ async function handleOrganizationChange(organizationId: string) {
     </SelectContent>
   </Select>
 </template>
-

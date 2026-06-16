@@ -51,6 +51,14 @@ onMounted(async () => {
   roleDraft.value = [...membersAdmin.selectedMemberRoles.value]
 })
 
+watch(
+  () => sessionStore.activeOrganizationId,
+  async () => {
+    await membersAdmin.refresh()
+    roleDraft.value = [...membersAdmin.selectedMemberRoles.value]
+  },
+)
+
 function selectMember(memberId: string) {
   membersAdmin.selectedMemberId.value = memberId
 }
