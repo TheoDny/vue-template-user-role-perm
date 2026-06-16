@@ -77,14 +77,10 @@ const permissionResources = {
 | Method | Path | Required permission | Purpose | Body |
 | --- | --- | --- | --- | --- |
 | `GET` | `/roles` | `ac:read` | List organization roles for the active organization | none |
+| `POST` | `/roles` | `ac:create` | Create an organization role for the active organization | `{ role: string, permissions?: Record<string, string[]> }` |
 | `PATCH` | `/roles/:roleId` | `ac:update` | Rename a role | `{ name: string }` |
 | `PATCH` | `/roles/:roleId/permissions` | `ac:update` | Update role permission matrix | `{ permissions: Record<string, string[]> }` |
 | `DELETE` | `/roles/:roleId` | `ac:delete` | Delete a role | none |
-| `POST` | `/api/auth/organization/create-role` | `ac:create` | Create a dynamic role through Better Auth | `{ role, permission?, organizationId? }` |
-
-API gap to resolve before implementation:
-
-The custom Nest roles controller has no `POST /roles` route, while the UI requires a role creation dialog. The preferred backend-aligned option is to add a custom Nest `POST /roles` proxy that applies the same active organization and error conventions as the other role routes. Until that exists, the frontend can call Better Auth directly at `/api/auth/organization/create-role`.
 
 ### Members
 
@@ -125,7 +121,7 @@ src/
 
 ### Services
 
-No Vue component should call `fetch` directly. Components call stores or composables; stores and composables call services.
+No Vue component should call `fetch` directly. Components call the session store, feature composables, or services. Components must not bypass service modules.
 
 Required service modules:
 
@@ -377,17 +373,15 @@ Route guards must use the current session store. If no session is loaded, fetch 
 
 ## State Management
 
-Use Pinia stores for shared application state:
+Use Pinia only for session-wide application state.
 
 | Store | Responsibility |
 | --- | --- |
 | `useSessionStore` | user, organizations, active organization, roles, permissions, refresh session |
-| `usePermissionStore` | API permission catalog and helper checks |
-| `useRolesStore` | roles list and role mutations |
-| `useMembersStore` | members list and member mutations |
-| `useInvitationsStore` | invitation list and invitation mutations |
 
-Stores should expose explicit actions and derived getters, for example `can("ac:update")` or `hasPermission("member:read")`.
+Feature data does not need Pinia stores. Roles, members, invitations, and permission catalog state should live in route-level components or feature composables such as `useRolesAdministration`, `useMembersAdministration`, `useInvitationsAdministration`, and `usePermissionCatalog`.
+
+`useSessionStore` should expose explicit actions and derived getters, for example `refreshSession`, `setActiveOrganization`, `can("ac:update")`, and `hasPermission("member:read")`.
 
 ## UI Rules
 
@@ -433,7 +427,8 @@ Recommended tests:
 
 - Unit tests for permission helpers.
 - Service tests with mocked fetch.
-- Store tests for optimistic and non-optimistic mutations.
+- Session store tests for authentication, organization switching, and permission checks.
+- Feature composable tests where mutation state is complex.
 - Route guard tests for allowed and denied permissions.
 
 ## Git Workflow
@@ -464,7 +459,7 @@ Scope:
 - Add shared API service.
 - Add base type files.
 - Add router skeleton.
-- Add Pinia setup.
+- Add Pinia setup for `useSessionStore`.
 - Add app shell placeholder.
 
 ### Phase 2: Session and organization context
@@ -489,7 +484,7 @@ Tag after merge: `0.3.0-develop`
 
 Scope:
 
-- Implement permission service and store.
+- Implement permission service and permission helpers or composable.
 - Implement dynamic sidebar.
 - Implement route guards.
 - Implement first allowed admin route redirect.
@@ -506,12 +501,8 @@ Scope:
 - Implement roles list.
 - Implement permission matrix editor.
 - Implement rename dialog.
-- Implement create role dialog.
+- Implement create role dialog with `POST /roles`.
 - Implement delete confirmation.
-
-Dependency:
-
-- Decide whether role creation uses custom `POST /roles` or Better Auth `/api/auth/organization/create-role`.
 
 ### Phase 5: Members administration
 
@@ -569,7 +560,6 @@ Scope:
 
 ## Open Decisions
 
-- Whether to add a custom backend `POST /roles` route before the roles UI phase.
 - Whether the first release includes member deletion or only role assignment.
 - Whether invitation accept and reject screens belong in the admin app or a separate public invitation flow.
 - Whether role names should be editable for static Better Auth roles or only for dynamic roles.
