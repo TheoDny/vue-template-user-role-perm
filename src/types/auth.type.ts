@@ -8,6 +8,20 @@ export type LoginRequest = {
   callbackURL?: string
 }
 
+export type EmailOtpType = "sign-in" | "change-email" | "email-verification" | "forget-password"
+
+export type SendEmailOtpRequest = {
+  email: string
+  type: EmailOtpType
+}
+
+export type SignInEmailOtpRequest = {
+  email: string
+  otp: string
+  name?: string
+  image?: string
+}
+
 export type AuthenticatedResponse = {
   authenticated: boolean
 }
@@ -43,4 +57,3 @@ export type CustomSession = {
   roles: string[]
   organizations: OrganizationSummary[]
 }
-
