@@ -1,5 +1,8 @@
+<script setup lang="ts">
+import { Toaster } from "@/components/ui/sonner"
+</script>
+
 <template>
-  <div>
-    <h1>Welcome to your new project</h1>
-  </div>
+    <RouterView />
+    <Toaster />
 </template>

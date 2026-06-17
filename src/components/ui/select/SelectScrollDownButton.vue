@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronDownIcon } from '@lucide/vue';
+import { ChevronDownIcon } from "@lucide/vue"
 
 import type { SelectScrollDownButtonProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
@@ -15,13 +15,18 @@ const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>
-  <SelectScrollDownButton
-    data-slot="select-scroll-down-button"
-    v-bind="forwardedProps"
-    :class="cn('bg-popover z-10 flex cursor-default items-center justify-center py-1 [&_svg:not([class*=size-])]:size-4', props.class)"
-  >
-    <slot>
-      <ChevronDownIcon />
-    </slot>
-  </SelectScrollDownButton>
+    <SelectScrollDownButton
+        data-slot="select-scroll-down-button"
+        v-bind="forwardedProps"
+        :class="
+            cn(
+                'bg-popover z-10 flex cursor-default items-center justify-center py-1 [&_svg:not([class*=size-])]:size-4',
+                props.class,
+            )
+        "
+    >
+        <slot>
+            <ChevronDownIcon />
+        </slot>
+    </SelectScrollDownButton>
 </template>

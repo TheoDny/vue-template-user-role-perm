@@ -4,3 +4,5 @@ node_modules
 /dist
 /build
 /node_modules
+vite.out.log
+vite.err.log
