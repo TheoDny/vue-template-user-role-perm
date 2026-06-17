@@ -18,6 +18,11 @@ const routes: RouteRecordRaw[] = [
         meta: { guestOnly: true },
     },
     {
+        path: "/invitations/:invitationId",
+        name: "invitation-response",
+        component: () => import("@/views/InvitationResponseView.vue"),
+    },
+    {
         path: "/",
         component: () => import("@/components/layout/AppShell.vue"),
         meta: { requiresAuth: true },
