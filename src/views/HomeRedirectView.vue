@@ -8,16 +8,16 @@ const router = useRouter()
 const sessionStore = useSessionStore()
 
 const firstAllowedRoute = computed(() => {
-  return getFirstAllowedAdministrationRouteName(sessionStore.hasPermission)
+    return getFirstAllowedAdministrationRouteName(sessionStore.hasPermission)
 })
 
 onMounted(() => {
-  void router.replace({ name: firstAllowedRoute.value })
+    void router.replace({ name: firstAllowedRoute.value })
 })
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
-    Loading workspace...
-  </div>
+    <div class="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
+        Loading workspace...
+    </div>
 </template>

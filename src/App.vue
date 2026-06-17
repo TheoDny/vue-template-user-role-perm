@@ -3,6 +3,6 @@ import { Toaster } from "@/components/ui/sonner"
 </script>
 
 <template>
-  <RouterView />
-  <Toaster />
+    <RouterView />
+    <Toaster />
 </template>

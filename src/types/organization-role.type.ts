@@ -1,25 +1,24 @@
 import type { PermissionMatrix } from "@/types/permission.type"
 
 export type OrganizationRole = {
-  id: string
-  role: string
-  name?: string
-  permission?: PermissionMatrix
-  permissions?: PermissionMatrix
-  createdAt?: string
-  updatedAt?: string
+    id: string
+    role: string
+    name?: string
+    permission?: PermissionMatrix
+    permissions?: PermissionMatrix
+    createdAt?: string
+    updatedAt?: string
 }
 
 export type CreateRoleRequest = {
-  role: string
-  permissions?: PermissionMatrix
+    role: string
+    permissions?: PermissionMatrix
 }
 
 export type UpdateRoleNameRequest = {
-  name: string
+    name: string
 }
 
 export type UpdateRolePermissionsRequest = {
-  permissions: PermissionMatrix
+    permissions: PermissionMatrix
 }
-

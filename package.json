@@ -1,40 +1,40 @@
 {
-  "name": "vue-template-user-role-perm",
-  "type": "module",
-  "version": "0.0.0",
-  "private": true,
-  "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@lucide/vue": "^1.18.0",
-    "@vee-validate/zod": "^4.15.1",
-    "@vueuse/core": "^14.3.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "pinia": "^3.0.4",
-    "reka-ui": "^2.9.10",
-    "shadcn-vue": "^2.7.4",
-    "tailwind-merge": "^3.6.0",
-    "tw-animate-css": "^1.4.0",
-    "vee-validate": "^4.15.1",
-    "vue": "^3.5.13",
-    "vue-input-otp": "^0.3.2",
-    "vue-router": "^5.1.0",
-    "vue-sonner": "^2.0.9",
-    "zod": "3.25.76"
-  },
-  "devDependencies": {
-    "@tailwindcss/vite": "^4.0.0",
-    "@types/node": "^25.9.3",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "prettier": "3.8.4",
-    "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.2",
-    "vite": "^6.4.3",
-    "vue-tsc": "^2.2.0"
-  },
-  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
+    "name": "vue-template-user-role-perm",
+    "type": "module",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "dev": "vite",
+        "build": "vue-tsc -b && vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@lucide/vue": "^1.18.0",
+        "@vee-validate/zod": "^4.15.1",
+        "@vueuse/core": "^14.3.0",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "pinia": "^3.0.4",
+        "reka-ui": "^2.9.10",
+        "shadcn-vue": "^2.7.4",
+        "tailwind-merge": "^3.6.0",
+        "tw-animate-css": "^1.4.0",
+        "vee-validate": "^4.15.1",
+        "vue": "^3.5.13",
+        "vue-input-otp": "^0.3.2",
+        "vue-router": "^5.1.0",
+        "vue-sonner": "^2.0.9",
+        "zod": "3.25.76"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.0.0",
+        "@types/node": "^25.9.3",
+        "@vitejs/plugin-vue": "^5.2.1",
+        "prettier": "3.8.4",
+        "tailwindcss": "^4.0.0",
+        "typescript": "^5.7.2",
+        "vite": "^6.4.3",
+        "vue-tsc": "^2.2.0"
+    },
+    "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
 }

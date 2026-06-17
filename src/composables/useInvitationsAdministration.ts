@@ -76,7 +76,7 @@ export function useInvitationsAdministration() {
         } finally {
             saving.value = false
         }
-    } 
+    }
 
     async function updateRoles(invitation: OrganizationInvitation, roles: string[]) {
         saving.value = true

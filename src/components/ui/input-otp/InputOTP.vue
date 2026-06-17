@@ -16,14 +16,14 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>
 
 <template>
-  <OTPInput
-    v-slot="slotProps"
-    v-bind="forwarded"
-    :container-class="cn('gap-2 flex items-center has-disabled:opacity-50', props.class)"
-    data-slot="input-otp"
-    :spellcheck="false"
-    class="disabled:cursor-not-allowed"
-  >
-    <slot v-bind="slotProps" />
-  </OTPInput>
+    <OTPInput
+        v-slot="slotProps"
+        v-bind="forwarded"
+        :container-class="cn('gap-2 flex items-center has-disabled:opacity-50', props.class)"
+        data-slot="input-otp"
+        :spellcheck="false"
+        class="disabled:cursor-not-allowed"
+    >
+        <slot v-bind="slotProps" />
+    </OTPInput>
 </template>

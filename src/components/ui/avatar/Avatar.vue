@@ -6,17 +6,17 @@ import { cn } from "@/lib/utils"
 import { avatarVariants } from "."
 
 const props = defineProps<{
-  class?: HTMLAttributes["class"]
-  size?: AvatarVariants["size"]
+    class?: HTMLAttributes["class"]
+    size?: AvatarVariants["size"]
 }>()
 </script>
 
 <template>
-  <AvatarRoot
-    data-slot="avatar"
-    :data-size="size ?? 'default'"
-    :class="cn(avatarVariants({ size }), props.class)"
-  >
-    <slot />
-  </AvatarRoot>
+    <AvatarRoot
+        data-slot="avatar"
+        :data-size="size ?? 'default'"
+        :class="cn(avatarVariants({ size }), props.class)"
+    >
+        <slot />
+    </AvatarRoot>
 </template>

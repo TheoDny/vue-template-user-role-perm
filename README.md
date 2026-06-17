@@ -44,4 +44,3 @@ The UI uses local shadcn-vue components from `src/components/ui/`.
 ## Git Workflow
 
 Development is integrated through `develop`. Each implementation phase starts from `develop`, uses a `feature/...` branch, merges back to `develop`, and is tagged with `0.X.X-develop`.
-

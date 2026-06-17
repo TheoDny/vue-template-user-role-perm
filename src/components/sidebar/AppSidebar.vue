@@ -2,18 +2,18 @@
 import NavUser from "@/components/sidebar/NavUser.vue"
 import OrganizationSwitcher from "@/components/sidebar/OrganizationSwitcher.vue"
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarRail,
-  SidebarSeparator,
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    SidebarRail,
+    SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { getVisibleAdministrationItems } from "@/lib/admin-navigation"
 import { APP_NAME } from "@/lib/env.ts"
@@ -45,7 +45,11 @@ const props = defineProps<{
                 <SidebarMenuItem>
                     <div class="flex flex-row text-left text-sm leading-tight gap-2 truncate justify-center">
                         <LayoutPanelLeft class="size-4" />
-                        <span class="truncate font-semibold" v-if="props.open">{{ APP_NAME }}</span>
+                        <span
+                            class="truncate font-semibold"
+                            v-if="props.open"
+                            >{{ APP_NAME }}</span
+                        >
                     </div>
                 </SidebarMenuItem>
             </SidebarMenu>
