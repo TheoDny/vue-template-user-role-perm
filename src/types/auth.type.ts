@@ -22,6 +22,31 @@ export type SignInEmailOtpRequest = {
     image?: string
 }
 
+export type RequestPasswordResetEmailOtpRequest = {
+    email: string
+}
+
+export type ResetPasswordEmailOtpRequest = {
+    email: string
+    otp: string
+    password: string
+}
+
+export type UserSessionSummary = {
+    id: string
+    createdAt: string | Date
+    updatedAt: string | Date
+    userId: string
+    expiresAt: string | Date
+    token: string
+    ipAddress?: string | null
+    userAgent?: string | null
+}
+
+export type RevokeSessionRequest = {
+    token: string
+}
+
 export type AuthenticatedResponse = {
     authenticated: boolean
 }

@@ -2,9 +2,15 @@ import { apiRequest } from "@/services/api.service"
 import type {
     AuthenticatedResponse,
     LoginRequest,
+    RequestPasswordResetEmailOtpRequest,
+    ResetPasswordEmailOtpRequest,
+    RevokeSessionRequest,
     SendEmailOtpRequest,
     SignInEmailOtpRequest,
+    UserSessionSummary,
 } from "@/types/auth.type"
+
+const BETTER_AUTH_BASE_PATH = import.meta.env.VITE_BETTER_AUTH_BASE_PATH ?? "/api/auth"
 
 export function login(payload: LoginRequest) {
     return apiRequest<unknown>("/auth/login", {
@@ -22,6 +28,31 @@ export function sendEmailOtp(payload: SendEmailOtpRequest) {
 
 export function signInEmailOtp(payload: SignInEmailOtpRequest) {
     return apiRequest<unknown>("/auth/email-otp/sign-in", {
+        method: "POST",
+        body: payload,
+    })
+}
+
+export function requestPasswordResetEmailOtp(payload: RequestPasswordResetEmailOtpRequest) {
+    return apiRequest<unknown>("/auth/password-reset/email-otp", {
+        method: "POST",
+        body: payload,
+    })
+}
+
+export function resetPasswordEmailOtp(payload: ResetPasswordEmailOtpRequest) {
+    return apiRequest<{ success: boolean }>(`${BETTER_AUTH_BASE_PATH}/email-otp/reset-password`, {
+        method: "POST",
+        body: payload,
+    })
+}
+
+export function listSessions() {
+    return apiRequest<UserSessionSummary[]>("/auth/sessions")
+}
+
+export function revokeSession(payload: RevokeSessionRequest) {
+    return apiRequest<{ status?: boolean; success?: boolean }>("/auth/sessions/revoke", {
         method: "POST",
         body: payload,
     })
