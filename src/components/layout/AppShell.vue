@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { RouterView } from "vue-router"
-import AppSidebar from "@/components/layout/AppSidebar.vue"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import AppSidebar from "@/components/sidebar/AppSidebar.vue"
 import { Separator } from "@/components/ui/separator"
-import { Toaster } from "@/components/ui/sonner"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { ref } from "vue"
+import { RouterView } from "vue-router"
+
+const open = ref(true)
 </script>
 
 <template>
-  <SidebarProvider>
-    <AppSidebar />
+  <SidebarProvider :open="open" @update:open="open = $event">
+    <AppSidebar :open="open" />
     <SidebarInset>
       <header class="flex h-14 shrink-0 items-center gap-3 border-b px-4">
         <SidebarTrigger />
@@ -24,6 +26,5 @@ import { Toaster } from "@/components/ui/sonner"
         <RouterView />
       </main>
     </SidebarInset>
-    <Toaster />
   </SidebarProvider>
 </template>

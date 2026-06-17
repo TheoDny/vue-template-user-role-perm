@@ -11,10 +11,16 @@ export function listInvitations() {
 }
 
 export function createInvitation(payload: CreateInvitationRequest) {
-  return apiRequest<OrganizationInvitation>("/invitations", {
-    method: "POST",
-    body: payload,
-  })
+    return apiRequest<OrganizationInvitation>("/invitations", {
+        method: "POST",
+        body: { ...payload, resend: true },
+    })
+}
+
+export function resendInvitation(invitationId: string) {
+    return apiRequest<OrganizationInvitation>(`/invitations/${invitationId}/resend`, {
+        method: "POST",
+    })
 }
 
 export function updateInvitationRoles(invitationId: string, payload: UpdateInvitationRolesRequest) {
