@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue"
 import InvitationDialogs from "@/components/invitations/InvitationDialogs.vue"
 import InvitationRolesPanel from "@/components/invitations/InvitationRolesPanel.vue"
 import InvitationsHeader from "@/components/invitations/InvitationsHeader.vue"
@@ -8,6 +7,7 @@ import { useInvitationsAdministration } from "@/composables/useInvitationsAdmini
 import { toUniqueRoles } from "@/lib/roles"
 import { useSessionStore } from "@/stores/session.store"
 import type { OrganizationInvitation } from "@/types/organization-invitation.type"
+import { computed, onMounted, ref, watch } from "vue"
 
 const sessionStore = useSessionStore()
 const invitationsAdmin = useInvitationsAdministration()
@@ -18,7 +18,6 @@ const invitationSearch = ref("")
 const invitationToCancel = ref<OrganizationInvitation | null>(null)
 const createEmail = ref("")
 const createRoles = ref<string[]>([])
-const resend = ref(false)
 
 const selectedInvitation = computed(() => invitationsAdmin.selectedInvitation.value)
 const canCreate = computed(() => sessionStore.hasPermission("invitation:create"))
@@ -111,11 +110,9 @@ async function handleCreateInvitation() {
   await invitationsAdmin.create({
     email: createEmail.value.trim(),
     roles: createRoles.value,
-    resend: resend.value,
   })
   createEmail.value = ""
   createRoles.value = []
-  resend.value = false
   createDialogOpen.value = false
 }
 
@@ -136,6 +133,10 @@ async function handleCancelInvitation() {
   cancelDialogOpen.value = false
   invitationToCancel.value = null
 }
+
+async function handleResendInvitation(invitationId: string) {
+  await invitationsAdmin.resend(invitationId)
+}
 </script>
 
 <template>
@@ -152,8 +153,10 @@ async function handleCancelInvitation() {
         :selected-invitation-id="invitationsAdmin.selectedInvitationId.value"
         :loading="invitationsAdmin.loading.value"
         :can-cancel="canCancel"
+        :can-resend="canCreate"
         @select="selectInvitation"
         @cancel="openCancelDialog"
+        @resend="handleResendInvitation"
       />
 
       <InvitationRolesPanel
@@ -177,7 +180,6 @@ async function handleCancelInvitation() {
       v-model:create-open="createDialogOpen"
       v-model:cancel-open="cancelDialogOpen"
       v-model:create-email="createEmail"
-      v-model:resend="resend"
       :create-roles="createRoles"
       :role-options="invitationsAdmin.roleOptions.value"
       :can-submit-create="canSubmitCreate"

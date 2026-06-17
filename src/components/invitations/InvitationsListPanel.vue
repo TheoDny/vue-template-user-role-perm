@@ -18,12 +18,14 @@ const props = defineProps<{
   search: string
   loading: boolean
   canCancel: boolean
+  canResend: boolean
 }>()
 
 const emit = defineEmits<{
   "update:search": [value: string]
   select: [invitationId: string]
   cancel: [invitation: OrganizationInvitation]
+  resend: [invitationId: string]
 }>()
 
 const filteredInvitations = computed(() => {
@@ -58,7 +60,7 @@ function getInvitationButtonClass(invitation: OrganizationInvitation): string {
   const isActive = invitation.id === props.selectedInvitationId
 
   return cn(
-    "group flex min-w-0 flex-1 items-center justify-between gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted",
+    "group flex min-w-0 flex-1 items-center gap-3 rounded-lg border p-3 text-left text-sm transition-colors hover:bg-muted",
     isActive && "border-primary bg-primary/5 shadow-sm",
   )
 }
@@ -70,6 +72,11 @@ function clearSearch() {
 function handleCancel(invitation: OrganizationInvitation) {
   emit("select", invitation.id)
   emit("cancel", invitation)
+}
+
+function handleResend(invitation: OrganizationInvitation) {
+  emit("select", invitation.id)
+  emit("resend", invitation.id)
 }
 </script>
 
@@ -121,7 +128,8 @@ function handleCancel(invitation: OrganizationInvitation) {
               :data-active="invitation.id === selectedInvitationId || undefined"
               @click="emit('select', invitation.id)"
             >
-              <span class="min-w-0">
+              <Mail :class="invitation.id === selectedInvitationId ? 'text-primary' : 'text-muted-foreground'" />
+              <span class="flex min-w-0 flex-1 flex-col gap-1">
                 <span class="block truncate text-sm font-medium">{{ invitation.email }}</span>
                 <span class="block truncate text-xs text-muted-foreground">
                   {{ parseRoleList(invitation.role).join(", ") || "No role" }}
@@ -130,21 +138,35 @@ function handleCancel(invitation: OrganizationInvitation) {
               <Badge :variant="statusVariant(invitation.status)">
                 {{ invitation.status }}
               </Badge>
+              <div class="flex shrink-0 gap-1">
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      :disabled="!canResend || invitation.status !== 'pending'"
+                      @click="handleResend(invitation)"
+                    >
+                      <Mail />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Resend invitation</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger as-child>
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      :disabled="!canCancel || invitation.status !== 'pending'"
+                      @click="handleCancel(invitation)"
+                    >
+                      <XCircle />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Cancel invitation</TooltipContent>
+                </Tooltip>
+              </div>
             </button>
-
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  :disabled="!canCancel || invitation.status !== 'pending'"
-                  @click="handleCancel(invitation)"
-                >
-                  <XCircle />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Cancel invitation</TooltipContent>
-            </Tooltip>
           </div>
         </template>
         <div

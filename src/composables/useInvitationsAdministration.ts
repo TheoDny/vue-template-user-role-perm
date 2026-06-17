@@ -4,6 +4,7 @@ import {
     cancelInvitation,
     createInvitation,
     listInvitations,
+    resendInvitation,
     updateInvitationRoles,
 } from "@/services/organization-invitation.service"
 import { listRoles } from "@/services/organization-role.service"
@@ -48,7 +49,7 @@ export function useInvitationsAdministration() {
         }
     }
 
-    async function create(payload: { email: string; roles: string[]; resend?: boolean }) {
+    async function create(payload: { email: string; roles: string[] }) {
         saving.value = true
 
         try {
@@ -62,6 +63,20 @@ export function useInvitationsAdministration() {
             saving.value = false
         }
     }
+
+    async function resend(invitationId: string) {
+        saving.value = true
+        try {
+            await resendInvitation(invitationId)
+            await refresh()
+            toast.success("Invitation resent")
+        } catch (error) {
+            toast.error(isApiError(error) ? error.message : "Unable to resend invitation")
+            throw error
+        } finally {
+            saving.value = false
+        }
+    } 
 
     async function updateRoles(invitation: OrganizationInvitation, roles: string[]) {
         saving.value = true
@@ -103,6 +118,7 @@ export function useInvitationsAdministration() {
         saving,
         refresh,
         create,
+        resend,
         updateRoles,
         cancel,
     }

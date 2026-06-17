@@ -71,7 +71,6 @@ function formatDate(value?: string): string {
           >
             Unsaved changes
           </Badge>
-          <Badge variant="outline">{{ selectedRoleCount }} / {{ roleOptions.length }}</Badge>
         </div>
       </CardAction>
     </CardHeader>

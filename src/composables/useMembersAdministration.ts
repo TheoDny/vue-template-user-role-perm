@@ -29,7 +29,6 @@ export function useMembersAdministration() {
         try {
             const [nextMembers, dynamicRoles] = await Promise.all([listMembers(), listRoles()])
             members.value = Array.isArray(nextMembers) ? nextMembers : []
-            console.log(members.value, nextMembers)
             roleOptions.value = Array.isArray(dynamicRoles) ? dynamicRoles.map((role) => role.role) : []
 
             if (!selectedMemberId.value || !members.value.some((member) => member.id === selectedMemberId.value)) {

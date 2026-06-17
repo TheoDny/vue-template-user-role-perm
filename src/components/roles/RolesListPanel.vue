@@ -9,7 +9,7 @@ import { getRoleKey, getRoleLabel } from "@/composables/useRolesAdministration"
 import { cn } from "@/lib/utils"
 import type { OrganizationRole } from "@/types/organization-role.type"
 import type { PermissionMatrix } from "@/types/permission.type"
-import { Pencil, RefreshCw, Trash2, X } from "@lucide/vue"
+import { Pencil, RefreshCw, ShieldCheck, Trash2, X } from "@lucide/vue"
 import { computed } from "vue"
 
 const props = defineProps<{
@@ -139,6 +139,7 @@ function handleDelete(role: OrganizationRole) {
               :data-active="getRoleKey(role) === selectedRoleKey || undefined"
               @click="emit('select', role)"
             >
+              <ShieldCheck :class="getRoleKey(role) === selectedRoleKey ? 'text-primary' : 'text-muted-foreground'" />
               <span class="flex min-w-0 flex-1 flex-col gap-1">
                 <span class="truncate font-medium">{{ getRoleLabel(role) }}</span>
                 <span class="text-xs text-muted-foreground">

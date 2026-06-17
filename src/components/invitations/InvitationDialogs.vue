@@ -29,7 +29,6 @@ defineProps<{
   cancelOpen: boolean
   createEmail: string
   createRoles: string[]
-  resend: boolean
   roleOptions: string[]
   canSubmitCreate: boolean
   saving: boolean
@@ -40,7 +39,6 @@ const emit = defineEmits<{
   "update:createOpen": [value: boolean]
   "update:cancelOpen": [value: boolean]
   "update:createEmail": [value: string]
-  "update:resend": [value: boolean]
   toggleCreateRole: [role: string]
   create: []
   cancel: []
@@ -90,18 +88,6 @@ function formatRole(role: string): string {
             </Field>
           </div>
         </FieldSet>
-        <Field
-          orientation="horizontal"
-          class="cursor-pointer items-center gap-2 rounded-lg border p-3"
-          @click="emit('update:resend', !resend)"
-        >
-          <Checkbox
-            :model-value="resend"
-            @click.stop
-            @update:model-value="(value) => emit('update:resend', value === true)"
-          />
-          <FieldLabel class="pointer-events-none">Resend if an invitation already exists</FieldLabel>
-        </Field>
       </FieldGroup>
       <DialogFooter>
         <Button
