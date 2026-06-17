@@ -2,16 +2,7 @@
 import { computed, onMounted, ref } from "vue"
 import { toast } from "vue-sonner"
 import { Laptop, RefreshCw, ShieldX } from "@lucide/vue"
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import ConfirmDialog from "@/components/common/ConfirmDialog.vue"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -170,26 +161,14 @@ function getSessionLabel(session: UserSessionSummary): string {
         </CardContent>
     </Card>
 
-    <AlertDialog
+    <ConfirmDialog
         :open="revokeDialogOpen"
+        title="Revoke this session?"
+        description="This signs out the selected device. Your current session will stay active."
+        confirm-label="Revoke session"
+        pending-label="Revoking..."
+        :pending="revoking"
         @update:open="revokeDialogOpen = $event"
-    >
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Revoke this session?</AlertDialogTitle>
-                <AlertDialogDescription>
-                    This signs out the selected device. Your current session will stay active.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-                <AlertDialogCancel :disabled="revoking">Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                    :disabled="revoking"
-                    @click="handleRevokeSession"
-                >
-                    {{ revoking ? "Revoking..." : "Revoke session" }}
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
+        @confirm="handleRevokeSession"
+    />
 </template>

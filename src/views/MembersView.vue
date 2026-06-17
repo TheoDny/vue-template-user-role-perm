@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import ConfirmDialog from "@/components/common/ConfirmDialog.vue"
 import MemberRolesPanel from "@/components/members/MemberRolesPanel.vue"
 import MembersHeader from "@/components/members/MembersHeader.vue"
 import MembersListPanel from "@/components/members/MembersListPanel.vue"
-import RemoveMemberDialog from "@/components/members/RemoveMemberDialog.vue"
-import { useMembersAdministration } from "@/composables/useMembersAdministration"
+import { getMemberLabel, useMembersAdministration } from "@/composables/useMembersAdministration"
 import { toUniqueRoles } from "@/lib/roles"
 import { useSessionStore } from "@/stores/session.store"
 import type { OrganizationMember } from "@/types/organization-member.type"
@@ -26,6 +26,10 @@ const hasChanges = computed(
 )
 const canSave = computed(() =>
     Boolean(selectedMember.value && canUpdate.value && roleDraft.value.length > 0 && hasChanges.value),
+)
+const removeMemberDescription = computed(
+    () =>
+        `This removes ${memberToRemove.value ? getMemberLabel(memberToRemove.value) : "the selected member"} from the active organization.`,
 )
 
 watch(
@@ -76,7 +80,7 @@ function resetRoleDraft() {
     roleDraft.value = [...membersAdmin.selectedMemberRoles.value]
 }
 
-function openRemoveMemberDialog(member: OrganizationMember) {
+function openRemoveMemberConfirmation(member: OrganizationMember) {
     memberToRemove.value = member
     deleteDialogOpen.value = true
 }
@@ -118,7 +122,7 @@ async function handleRemoveMember() {
                 :can-delete="canDelete"
                 :current-user-id="sessionStore.user?.id"
                 @select="selectMember"
-                @remove="openRemoveMemberDialog"
+                @remove="openRemoveMemberConfirmation"
                 @refresh="handleRefresh"
             />
 
@@ -138,10 +142,13 @@ async function handleRemoveMember() {
             />
         </div>
 
-        <RemoveMemberDialog
+        <ConfirmDialog
             v-model:open="deleteDialogOpen"
-            :member="memberToRemove"
-            :saving="membersAdmin.saving.value"
+            title="Remove member"
+            :description="removeMemberDescription"
+            confirm-label="Remove"
+            pending-label="Removing..."
+            :pending="membersAdmin.saving.value"
             @confirm="handleRemoveMember"
         />
     </section>

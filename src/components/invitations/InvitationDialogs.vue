@@ -1,14 +1,6 @@
 <script setup lang="ts">
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { computed } from "vue"
+import ConfirmDialog from "@/components/common/ConfirmDialog.vue"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -21,10 +13,9 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
 import type { OrganizationInvitation } from "@/types/organization-invitation.type"
 
-defineProps<{
+const props = defineProps<{
     createOpen: boolean
     cancelOpen: boolean
     createEmail: string
@@ -47,6 +38,11 @@ const emit = defineEmits<{
 function formatRole(role: string): string {
     return role.replace(/[-_]/g, " ")
 }
+
+const cancelDescription = computed(
+    () =>
+        `This prevents ${props.invitationToCancel?.email ?? "the recipient"} from accepting the selected invitation.`,
+)
 </script>
 
 <template>
@@ -106,28 +102,14 @@ function formatRole(role: string): string {
         </DialogContent>
     </Dialog>
 
-    <AlertDialog
+    <ConfirmDialog
         :open="cancelOpen"
+        title="Cancel invitation"
+        :description="cancelDescription"
+        confirm-label="Cancel invitation"
+        pending-label="Canceling..."
+        :pending="saving"
         @update:open="(value) => emit('update:cancelOpen', value)"
-    >
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Cancel invitation</AlertDialogTitle>
-                <AlertDialogDescription>
-                    This prevents {{ invitationToCancel?.email ?? "the recipient" }} from accepting the selected
-                    invitation.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <Separator />
-            <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                    :disabled="saving"
-                    @click="emit('cancel')"
-                >
-                    Cancel invitation
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
+        @confirm="emit('cancel')"
+    />
 </template>

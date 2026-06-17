@@ -1,14 +1,5 @@
 <script setup lang="ts">
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import ConfirmDialog from "@/components/common/ConfirmDialog.vue"
 import { Button } from "@/components/ui/button"
 import {
     Dialog,
@@ -20,7 +11,6 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Separator } from "@/components/ui/separator"
 
 defineProps<{
     createOpen: boolean
@@ -118,27 +108,14 @@ const emit = defineEmits<{
         </DialogContent>
     </Dialog>
 
-    <AlertDialog
+    <ConfirmDialog
         :open="deleteOpen"
+        title="Delete role"
+        description="This action cannot be undone. Roles assigned to members cannot be deleted."
+        confirm-label="Delete"
+        pending-label="Deleting..."
+        :pending="saving"
         @update:open="(value) => emit('update:deleteOpen', value)"
-    >
-        <AlertDialogContent>
-            <AlertDialogHeader>
-                <AlertDialogTitle>Delete role</AlertDialogTitle>
-                <AlertDialogDescription>
-                    This action cannot be undone. Roles assigned to members cannot be deleted.
-                </AlertDialogDescription>
-            </AlertDialogHeader>
-            <Separator />
-            <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                    :disabled="saving"
-                    @click="emit('delete')"
-                >
-                    Delete
-                </AlertDialogAction>
-            </AlertDialogFooter>
-        </AlertDialogContent>
-    </AlertDialog>
+        @confirm="emit('delete')"
+    />
 </template>
