@@ -5,11 +5,11 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { getRoleKey, getRoleLabel, isStaticRole } from "@/composables/useRolesAdministration"
+import { getRoleKey, getRoleLabel } from "@/composables/useRolesAdministration"
 import { cn } from "@/lib/utils"
 import type { OrganizationRole } from "@/types/organization-role.type"
 import type { PermissionMatrix } from "@/types/permission.type"
-import { Pencil, Trash2, X } from "@lucide/vue"
+import { Pencil, RefreshCw, Trash2, X } from "@lucide/vue"
 import { computed } from "vue"
 
 const props = defineProps<{
@@ -26,6 +26,7 @@ const emit = defineEmits<{
   select: [role: OrganizationRole]
   rename: [role: OrganizationRole]
   delete: [role: OrganizationRole]
+  refresh: []
 }>()
 
 const filteredRoles = computed(() => {
@@ -81,7 +82,22 @@ function handleDelete(role: OrganizationRole) {
       <CardTitle>Role list</CardTitle>
       <CardDescription>{{ roles.length }} roles in this organization</CardDescription>
       <CardAction>
-        <Badge variant="outline">{{ filteredRoles.length }}</Badge>
+        <div class="flex flex-wrap justify-end gap-2">
+          <Tooltip>
+            <TooltipTrigger as-child>
+              <Button
+                variant="outline"
+                size="icon"
+                :disabled="loading"
+                aria-label="Refresh roles"
+                @click="emit('refresh')"
+              >
+                <RefreshCw />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Refresh roles</TooltipContent>
+          </Tooltip>
+        </div>
       </CardAction>
     </CardHeader>
     <CardContent class="flex min-h-0 flex-col gap-3">
@@ -130,10 +146,9 @@ function handleDelete(role: OrganizationRole) {
                 </span>
               </span>
               <Badge
-                v-if="isStaticRole(role)"
                 variant="secondary"
               >
-                Static
+                {{ role.role }}
               </Badge>
               <div class="flex shrink-0 gap-1">
               <Tooltip>

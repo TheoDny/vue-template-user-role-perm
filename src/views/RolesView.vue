@@ -165,6 +165,11 @@ async function handleDeleteRole() {
   deleteDialogOpen.value = false
   actionRole.value = null
 }
+
+async function handleRefresh() {
+  await rolesAdmin.refresh()
+  draftPermissions.value = clonePermissions(rolesAdmin.selectedPermissions.value)
+}
 </script>
 
 <template>
@@ -185,6 +190,7 @@ async function handleDeleteRole() {
         @select="selectRole"
         @rename="openRenameDialog"
         @delete="openDeleteDialog"
+        @refresh="handleRefresh"
       />
 
       <RolePermissionsPanel
