@@ -3,6 +3,8 @@ import { isApiError } from "@/services/api.service"
 import { deleteMember, listMembers, updateMemberRoles } from "@/services/organization-member.service"
 import { listRoles } from "@/services/organization-role.service"
 import type { OrganizationMember } from "@/types/organization-member.type"
+import { memberIdSchema, updateMemberRolesSchema } from "@/validators/member.schema"
+import { getZodErrorMessage } from "@/validators/validation"
 import { computed, ref } from "vue"
 import { toast } from "vue-sonner"
 
@@ -45,11 +47,15 @@ export function useMembersAdministration() {
         saving.value = true
 
         try {
-            await updateMemberRoles(member.id, { roles: toUniqueRoles(roles) })
+            const memberId = memberIdSchema.parse(member.id)
+            const payload = updateMemberRolesSchema.parse({ roles: toUniqueRoles(roles) })
+            await updateMemberRoles(memberId, payload)
             await refresh()
             toast.success("Member roles updated")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to update member roles")
+            toast.error(
+                getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to update member roles"),
+            )
             throw error
         } finally {
             saving.value = false
@@ -60,11 +66,11 @@ export function useMembersAdministration() {
         saving.value = true
 
         try {
-            await deleteMember(member.id)
+            await deleteMember(memberIdSchema.parse(member.id))
             await refresh()
             toast.success("Member removed")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to remove member")
+            toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to remove member"))
             throw error
         } finally {
             saving.value = false
