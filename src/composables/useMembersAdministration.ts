@@ -1,5 +1,5 @@
 import { parseRoleList, toUniqueRoles } from "@/lib/roles"
-import { isApiError } from "@/services/api.service"
+import { getApiErrorMessage } from "@/services/api.service"
 import { deleteMember, listMembers, updateMemberRoles } from "@/services/organization-member.service"
 import { listRoles } from "@/services/organization-role.service"
 import type { OrganizationMember } from "@/types/organization-member.type"
@@ -8,6 +8,14 @@ import { toast } from "vue-sonner"
 
 export function getMemberLabel(member: OrganizationMember): string {
     return member.user?.name || member.user?.email || member.userId || member.id
+}
+
+function showErrorToast(error: unknown, fallback: string) {
+    const message = getApiErrorMessage(error, fallback)
+
+    if (message) {
+        toast.error(message)
+    }
 }
 
 export function useMembersAdministration() {
@@ -35,7 +43,7 @@ export function useMembersAdministration() {
                 selectedMemberId.value = members.value[0]?.id ?? null
             }
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to load members")
+            showErrorToast(error, "Unable to load members")
         } finally {
             loading.value = false
         }
@@ -49,7 +57,7 @@ export function useMembersAdministration() {
             await refresh()
             toast.success("Member roles updated")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to update member roles")
+            showErrorToast(error, "Unable to update member roles")
             throw error
         } finally {
             saving.value = false
@@ -64,7 +72,7 @@ export function useMembersAdministration() {
             await refresh()
             toast.success("Member removed")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to remove member")
+            showErrorToast(error, "Unable to remove member")
             throw error
         } finally {
             saving.value = false

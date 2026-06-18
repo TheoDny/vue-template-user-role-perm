@@ -8,7 +8,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { isApiError } from "@/services/api.service"
+import { getApiErrorMessage } from "@/services/api.service"
 import { login, sendEmailOtp, signInEmailOtp } from "@/services/auth.service"
 
 const emit = defineEmits<{
@@ -23,6 +23,14 @@ const otpSent = ref(false)
 const passwordPending = ref(false)
 const otpPending = ref(false)
 
+function showErrorToast(error: unknown, fallback: string) {
+    const message = getApiErrorMessage(error, fallback)
+
+    if (message) {
+        toast.error(message)
+    }
+}
+
 async function handlePasswordSignIn() {
     passwordPending.value = true
 
@@ -30,7 +38,7 @@ async function handlePasswordSignIn() {
         await login({ email: passwordEmail.value, password: password.value })
         emit("authenticated")
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to sign in")
+        showErrorToast(error, "Unable to sign in")
     } finally {
         passwordPending.value = false
     }
@@ -47,7 +55,7 @@ async function handleSendOtp() {
         otpSent.value = true
         toast.success("Verification code sent")
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to send verification code")
+        showErrorToast(error, "Unable to send verification code")
     } finally {
         otpPending.value = false
     }
@@ -63,7 +71,7 @@ async function handleOtpSignIn() {
         })
         emit("authenticated")
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to verify code")
+        showErrorToast(error, "Unable to verify code")
     } finally {
         otpPending.value = false
     }

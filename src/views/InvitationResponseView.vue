@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { isApiError } from "@/services/api.service"
+import { getApiErrorMessage, isApiError } from "@/services/api.service"
 import { signOut as signOutRequest } from "@/services/auth.service"
 import {
     acceptInvitation,
@@ -51,6 +51,14 @@ const roleLabel = computed(() => {
 
     return roles ?? "Member"
 })
+
+function showErrorToast(error: unknown, fallback: string) {
+    const message = getApiErrorMessage(error, fallback)
+
+    if (message) {
+        toast.error(message)
+    }
+}
 
 onMounted(async () => {
     await bootstrap()
@@ -105,7 +113,7 @@ async function resolveInvitationDetails() {
         resolutionFailed.value = true
     } catch (error) {
         resolutionFailed.value = true
-        toast.error(isApiError(error) ? error.message : "Unable to load invitation details")
+        showErrorToast(error, "Unable to load invitation details")
     } finally {
         resolvingInvitation.value = false
     }
@@ -120,7 +128,7 @@ async function handleAccept() {
         toast.success("Invitation accepted")
         await sessionStore.refreshSession()
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to accept invitation")
+        showErrorToast(error, "Unable to accept invitation")
     } finally {
         pendingAction.value = null
     }
@@ -134,7 +142,7 @@ async function handleReject() {
         completedAction.value = "rejected"
         toast.success("Invitation rejected")
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to reject invitation")
+        showErrorToast(error, "Unable to reject invitation")
     } finally {
         pendingAction.value = null
     }

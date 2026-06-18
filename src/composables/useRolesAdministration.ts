@@ -1,4 +1,4 @@
-import { isApiError } from "@/services/api.service"
+import { getApiErrorMessage } from "@/services/api.service"
 import {
     createRole,
     deleteRole,
@@ -28,6 +28,14 @@ export function getRoleLabel(role: OrganizationRole): string {
 
 export function getRoleKey(role: OrganizationRole): string {
     return role.id || role.role
+}
+
+function showErrorToast(error: unknown, fallback: string) {
+    const message = getApiErrorMessage(error, fallback)
+
+    if (message) {
+        toast.error(message)
+    }
 }
 
 export function useRolesAdministration() {
@@ -60,7 +68,7 @@ export function useRolesAdministration() {
                 selectedRoleKey.value = roles.value[0] ? getRoleKey(roles.value[0]) : null
             }
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to load roles")
+            showErrorToast(error, "Unable to load roles")
         } finally {
             loading.value = false
         }
@@ -75,7 +83,7 @@ export function useRolesAdministration() {
             selectedRoleKey.value = payload.role
             toast.success("Role created")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to create role")
+            showErrorToast(error, "Unable to create role")
             throw error
         } finally {
             saving.value = false
@@ -90,7 +98,7 @@ export function useRolesAdministration() {
             await refresh()
             toast.success("Role renamed")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to rename role")
+            showErrorToast(error, "Unable to rename role")
             throw error
         } finally {
             saving.value = false
@@ -105,7 +113,7 @@ export function useRolesAdministration() {
             await refresh()
             toast.success("Role permissions updated")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to update role permissions")
+            showErrorToast(error, "Unable to update role permissions")
             throw error
         } finally {
             saving.value = false
@@ -120,7 +128,7 @@ export function useRolesAdministration() {
             await refresh()
             toast.success("Role deleted")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to delete role")
+            showErrorToast(error, "Unable to delete role")
             throw error
         } finally {
             saving.value = false

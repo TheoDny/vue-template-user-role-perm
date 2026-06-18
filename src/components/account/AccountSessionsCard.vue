@@ -6,7 +6,7 @@ import ConfirmDialog from "@/components/common/ConfirmDialog.vue"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { isApiError } from "@/services/api.service"
+import { getApiErrorMessage } from "@/services/api.service"
 import { listSessions, revokeSession } from "@/services/auth.service"
 import { useSessionStore } from "@/stores/session.store"
 import type { UserSessionSummary } from "@/types/auth.type"
@@ -25,6 +25,14 @@ const otherSessions = computed(() =>
         .sort((left, right) => dateValue(right.updatedAt) - dateValue(left.updatedAt)),
 )
 
+function showErrorToast(error: unknown, fallback: string) {
+    const message = getApiErrorMessage(error, fallback)
+
+    if (message) {
+        toast.error(message)
+    }
+}
+
 onMounted(() => {
     void refreshSessions()
 })
@@ -35,7 +43,7 @@ async function refreshSessions() {
     try {
         sessions.value = await listSessions()
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to load sessions")
+        showErrorToast(error, "Unable to load sessions")
     } finally {
         loading.value = false
     }
@@ -60,7 +68,7 @@ async function handleRevokeSession() {
         sessionToRevoke.value = null
         await refreshSessions()
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to revoke session")
+        showErrorToast(error, "Unable to revoke session")
     } finally {
         revoking.value = false
     }
