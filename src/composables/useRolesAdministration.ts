@@ -9,6 +9,13 @@ import {
 import { listPermissions } from "@/services/permission.service"
 import type { OrganizationRole } from "@/types/organization-role.type"
 import type { PermissionCatalog, PermissionMatrix } from "@/types/permission.type"
+import {
+    createRoleSchema,
+    roleIdSchema,
+    updateRoleNameSchema,
+    updateRolePermissionsSchema,
+} from "@/validators/role.schema"
+import { getZodErrorMessage } from "@/validators/validation"
 import { computed, ref } from "vue"
 import { toast } from "vue-sonner"
 
@@ -70,12 +77,13 @@ export function useRolesAdministration() {
         saving.value = true
 
         try {
-            await createRole(payload)
+            const nextPayload = createRoleSchema.parse(payload)
+            await createRole(nextPayload)
             await refresh()
-            selectedRoleKey.value = payload.role
+            selectedRoleKey.value = nextPayload.role
             toast.success("Role created")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to create role")
+            toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to create role"))
             throw error
         } finally {
             saving.value = false
@@ -86,11 +94,13 @@ export function useRolesAdministration() {
         saving.value = true
 
         try {
-            await updateRoleName(getRoleKey(role), { name })
+            const roleId = roleIdSchema.parse(getRoleKey(role))
+            const payload = updateRoleNameSchema.parse({ name })
+            await updateRoleName(roleId, payload)
             await refresh()
             toast.success("Role renamed")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to rename role")
+            toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to rename role"))
             throw error
         } finally {
             saving.value = false
@@ -101,11 +111,15 @@ export function useRolesAdministration() {
         saving.value = true
 
         try {
-            await updateRolePermissions(getRoleKey(role), { permissions })
+            const roleId = roleIdSchema.parse(getRoleKey(role))
+            const payload = updateRolePermissionsSchema.parse({ permissions })
+            await updateRolePermissions(roleId, payload)
             await refresh()
             toast.success("Role permissions updated")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to update role permissions")
+            toast.error(
+                getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to update role permissions"),
+            )
             throw error
         } finally {
             saving.value = false
@@ -116,11 +130,11 @@ export function useRolesAdministration() {
         saving.value = true
 
         try {
-            await deleteRole(getRoleKey(role))
+            await deleteRole(roleIdSchema.parse(getRoleKey(role)))
             await refresh()
             toast.success("Role deleted")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to delete role")
+            toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to delete role"))
             throw error
         } finally {
             saving.value = false
