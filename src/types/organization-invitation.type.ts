@@ -10,7 +10,7 @@ export type OrganizationInvitation = {
     organizationId?: string
 }
 
-export type PublicInvitation = OrganizationInvitation & {
+export type InvitationOrgAndInviter = OrganizationInvitation & {
     organization?: {
         id: string
         name: string
