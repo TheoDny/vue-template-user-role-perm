@@ -14,7 +14,6 @@ Required environment values:
 
 ```env
 VITE_API_BASE_URL=http://localhost:3000
-VITE_BETTER_AUTH_BASE_PATH=/api/auth
 ```
 
 ## Commands
