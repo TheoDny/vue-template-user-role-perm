@@ -10,8 +10,6 @@ import type {
     UserSessionSummary,
 } from "@/types/auth.type"
 
-const BETTER_AUTH_BASE_PATH = import.meta.env.VITE_BETTER_AUTH_BASE_PATH ?? "/api/auth"
-
 export function login(payload: LoginRequest) {
     return apiRequest<unknown>("/auth/login", {
         method: "POST",
@@ -41,7 +39,7 @@ export function requestPasswordResetEmailOtp(payload: RequestPasswordResetEmailO
 }
 
 export function resetPasswordEmailOtp(payload: ResetPasswordEmailOtpRequest) {
-    return apiRequest<{ success: boolean }>(`${BETTER_AUTH_BASE_PATH}/email-otp/reset-password`, {
+    return apiRequest<{ success: boolean }>("/auth/email-otp/reset-password", {
         method: "POST",
         body: payload,
     })

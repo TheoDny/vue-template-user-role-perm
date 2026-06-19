@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
-import { toast } from "vue-sonner"
-import { Laptop, RefreshCw, ShieldX } from "@lucide/vue"
 import ConfirmDialog from "@/components/common/ConfirmDialog.vue"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
-import { isApiError } from "@/services/api.service"
+import { showErrorToast } from "@/lib/utils"
 import { listSessions, revokeSession } from "@/services/auth.service"
 import { useSessionStore } from "@/stores/session.store"
 import type { UserSessionSummary } from "@/types/auth.type"
+import { revokeSessionSchema } from "@/validators/auth.schema"
+import { Laptop, RefreshCw, ShieldX } from "@lucide/vue"
+import { computed, onMounted, ref } from "vue"
+import { toast } from "vue-sonner"
 
 const sessionStore = useSessionStore()
 const sessions = ref<UserSessionSummary[]>([])
@@ -35,7 +36,7 @@ async function refreshSessions() {
     try {
         sessions.value = await listSessions()
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to load sessions")
+        showErrorToast(error, "Unable to load sessions")
     } finally {
         loading.value = false
     }
@@ -54,13 +55,14 @@ async function handleRevokeSession() {
     revoking.value = true
 
     try {
-        await revokeSession({ token: sessionToRevoke.value.token })
+        const payload = revokeSessionSchema.parse({ token: sessionToRevoke.value.token })
+        await revokeSession(payload)
         toast.success("Session revoked")
         revokeDialogOpen.value = false
         sessionToRevoke.value = null
         await refreshSessions()
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to revoke session")
+        showErrorToast(error, "Unable to revoke session")
     } finally {
         revoking.value = false
     }

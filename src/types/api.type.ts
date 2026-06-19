@@ -5,10 +5,12 @@ export type ApiError = {
     message: string
     code?: string
     details?: unknown
+    handled?: boolean
 }
 
 export type RequestOptions = {
     method?: HttpMethod
     body?: unknown
     signal?: AbortSignal
+    skipGlobalErrorHandler?: boolean
 }

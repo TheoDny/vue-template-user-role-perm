@@ -1,27 +1,24 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
-import { useRoute, useRouter } from "vue-router"
-import { toast } from "vue-sonner"
-import { ArrowLeft, Check, LogOut, X } from "@lucide/vue"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { isApiError } from "@/services/api.service"
+import { showErrorToast } from "@/lib/utils"
 import { signOut as signOutRequest } from "@/services/auth.service"
-import {
-    acceptInvitation,
-    getPublicInvitation,
-    rejectInvitation,
-} from "@/services/organization-invitation.service"
+import { acceptInvitation, getInvitation, rejectInvitation } from "@/services/organization-invitation.service"
 import { useSessionStore } from "@/stores/session.store"
-import type { PublicInvitation } from "@/types/organization-invitation.type"
+import type { InvitationOrgAndInviter } from "@/types/organization-invitation.type"
+import { invitationIdSchema } from "@/validators/invitation.schema"
+import { ArrowLeft, Check, LogOut, X } from "@lucide/vue"
+import { computed, onMounted, ref } from "vue"
+import { useRoute, useRouter } from "vue-router"
+import { toast } from "vue-sonner"
 
 const route = useRoute()
 const router = useRouter()
 const sessionStore = useSessionStore()
 
-const invitation = ref<PublicInvitation | null>(null)
+const invitation = ref<InvitationOrgAndInviter | null>(null)
 const loading = ref(true)
 const resolvingInvitation = ref(false)
 const pendingAction = ref<"accept" | "reject" | "logout" | null>(null)
@@ -37,7 +34,7 @@ const canVerifyInvitee = computed(() => Boolean(invitationEmail.value && current
 const isDifferentInvitee = computed(
     () => canVerifyInvitee.value && invitationEmail.value !== currentUserEmail.value,
 )
-const isAnswerableStatus = computed(() => !invitation.value || invitation.value.status === "pending")
+const isAnswerableStatus = computed(() => Boolean(invitation.value && invitation.value.status === "pending"))
 const canAnswerInvitation = computed(
     () => hasSession.value && !isDifferentInvitee.value && isAnswerableStatus.value && !completedAction.value,
 )
@@ -84,28 +81,10 @@ async function resolveInvitationDetails() {
     resolutionFailed.value = false
 
     try {
-        const organizationId = typeof route.query.organizationId === "string" ? route.query.organizationId : null
-        const candidateOrganizationIds = [
-            organizationId,
-            sessionStore.activeOrganizationId,
-            ...sessionStore.organizations.map((organization) => organization.id),
-        ].filter((value, index, values): value is string => Boolean(value) && values.indexOf(value) === index)
-
-        for (const candidateOrganizationId of candidateOrganizationIds) {
-            try {
-                invitation.value = await getPublicInvitation(candidateOrganizationId, invitationId.value)
-                return
-            } catch (error) {
-                if (!isApiError(error) || error.status !== 404) {
-                    throw error
-                }
-            }
-        }
-
-        resolutionFailed.value = true
+        invitation.value = await getInvitation(invitationIdSchema.parse(invitationId.value))
     } catch (error) {
         resolutionFailed.value = true
-        toast.error(isApiError(error) ? error.message : "Unable to load invitation details")
+        showErrorToast(error, "Unable to load invitation details")
     } finally {
         resolvingInvitation.value = false
     }
@@ -115,12 +94,12 @@ async function handleAccept() {
     pendingAction.value = "accept"
 
     try {
-        await acceptInvitation(invitationId.value)
+        await acceptInvitation(invitationIdSchema.parse(invitationId.value))
         completedAction.value = "accepted"
         toast.success("Invitation accepted")
         await sessionStore.refreshSession()
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to accept invitation")
+        showErrorToast(error, "Unable to accept invitation")
     } finally {
         pendingAction.value = null
     }
@@ -130,11 +109,11 @@ async function handleReject() {
     pendingAction.value = "reject"
 
     try {
-        await rejectInvitation(invitationId.value)
+        await rejectInvitation(invitationIdSchema.parse(invitationId.value))
         completedAction.value = "rejected"
         toast.success("Invitation rejected")
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to reject invitation")
+        showErrorToast(error, "Unable to reject invitation")
     } finally {
         pendingAction.value = null
     }
@@ -215,6 +194,16 @@ async function handleLogout() {
                 </div>
 
                 <div
+                    v-else-if="resolutionFailed"
+                    class="flex flex-col gap-3"
+                >
+                    <p class="text-sm text-muted-foreground">
+                        Invitation details could not be loaded from this link. Check that the invitation still
+                        exists, then try again.
+                    </p>
+                </div>
+
+                <div
                     v-else
                     class="flex flex-col gap-4"
                 >
@@ -223,26 +212,7 @@ async function handleLogout() {
                         <p class="text-sm text-muted-foreground">You are invited as {{ roleLabel }}.</p>
                     </div>
 
-                    <Separator />
-
-                    <div class="grid gap-3 text-sm sm:grid-cols-2">
-                        <div class="flex flex-col gap-1">
-                            <span class="text-muted-foreground">Invited email</span>
-                            <span class="font-medium">{{ invitation?.email ?? sessionStore.user?.email }}</span>
-                        </div>
-                        <div class="flex flex-col gap-1">
-                            <span class="text-muted-foreground">Signed in as</span>
-                            <span class="font-medium">{{ sessionStore.user?.email }}</span>
-                        </div>
-                    </div>
-
-                    <p
-                        v-if="resolutionFailed"
-                        class="text-sm text-muted-foreground"
-                    >
-                        Detailed invitation information could not be loaded from this link. You can still answer
-                        the invitation with the current signed-in account.
-                    </p>
+                    <Separator v-if="!isAnswerableStatus || resolvingInvitation"/>
 
                     <p
                         v-if="resolvingInvitation"

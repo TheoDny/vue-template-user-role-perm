@@ -1,5 +1,5 @@
 import { parseRoleList, toUniqueRoles } from "@/lib/roles"
-import { isApiError } from "@/services/api.service"
+import { showErrorToast } from "@/lib/utils"
 import {
     cancelInvitation,
     createInvitation,
@@ -9,6 +9,11 @@ import {
 } from "@/services/organization-invitation.service"
 import { listRoles } from "@/services/organization-role.service"
 import type { OrganizationInvitation } from "@/types/organization-invitation.type"
+import {
+    createInvitationSchema,
+    invitationIdSchema,
+    updateInvitationRolesSchema,
+} from "@/validators/invitation.schema"
 import { computed, ref } from "vue"
 import { toast } from "vue-sonner"
 
@@ -43,7 +48,7 @@ export function useInvitationsAdministration() {
                 selectedInvitationId.value = invitations.value[0]?.id ?? null
             }
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to load invitations")
+            showErrorToast(error, "Unable to load invitations")
         } finally {
             loading.value = false
         }
@@ -53,11 +58,12 @@ export function useInvitationsAdministration() {
         saving.value = true
 
         try {
-            await createInvitation({ ...payload, roles: toUniqueRoles(payload.roles) })
+            const nextPayload = createInvitationSchema.parse({ ...payload, roles: toUniqueRoles(payload.roles) })
+            await createInvitation(nextPayload)
             await refresh()
             toast.success("Invitation created")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to create invitation")
+            showErrorToast(error, "Unable to create invitation")
             throw error
         } finally {
             saving.value = false
@@ -67,11 +73,11 @@ export function useInvitationsAdministration() {
     async function resend(invitationId: string) {
         saving.value = true
         try {
-            await resendInvitation(invitationId)
+            await resendInvitation(invitationIdSchema.parse(invitationId))
             await refresh()
             toast.success("Invitation resent")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to resend invitation")
+            showErrorToast(error, "Unable to resend invitation")
             throw error
         } finally {
             saving.value = false
@@ -82,11 +88,13 @@ export function useInvitationsAdministration() {
         saving.value = true
 
         try {
-            await updateInvitationRoles(invitation.id, { roles: toUniqueRoles(roles) })
+            const invitationId = invitationIdSchema.parse(invitation.id)
+            const payload = updateInvitationRolesSchema.parse({ roles: toUniqueRoles(roles) })
+            await updateInvitationRoles(invitationId, payload)
             await refresh()
             toast.success("Invitation roles updated")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to update invitation roles")
+            showErrorToast(error, "Unable to update invitation roles")
             throw error
         } finally {
             saving.value = false
@@ -97,11 +105,11 @@ export function useInvitationsAdministration() {
         saving.value = true
 
         try {
-            await cancelInvitation(invitation.id)
+            await cancelInvitation(invitationIdSchema.parse(invitation.id))
             await refresh()
             toast.success("Invitation canceled")
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to cancel invitation")
+            showErrorToast(error, "Unable to cancel invitation")
             throw error
         } finally {
             saving.value = false

@@ -4,6 +4,7 @@ import { getSession } from "@/services/session.service"
 import { setActiveOrganization as setActiveOrganizationRequest } from "@/services/organization.service"
 import type { CustomSession } from "@/types/auth.type"
 import type { Permission } from "@/types/permission.type"
+import { setActiveOrganizationSchema } from "@/validators/organization.schema"
 
 export const useSessionStore = defineStore("session", () => {
     const session = ref<CustomSession | null>(null)
@@ -45,7 +46,8 @@ export const useSessionStore = defineStore("session", () => {
     }
 
     async function setActiveOrganization(organizationId: string | null) {
-        await setActiveOrganizationRequest({ organizationId })
+        const payload = setActiveOrganizationSchema.parse({ organizationId })
+        await setActiveOrganizationRequest(payload)
         await refreshSession()
     }
 

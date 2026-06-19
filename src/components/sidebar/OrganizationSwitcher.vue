@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getFirstAllowedAdministrationRouteName } from "@/lib/admin-navigation"
-import { isApiError } from "@/services/api.service"
+import { getApiErrorMessage } from "@/services/api.service"
 import { useSessionStore } from "@/stores/session.store"
 import { Building2 } from "@lucide/vue"
 import { computed, ref } from "vue"
@@ -35,7 +35,11 @@ async function handleOrganizationChange(organizationId: string) {
             await router.replace({ name: getFirstAllowedAdministrationRouteName(sessionStore.hasPermission) })
         }
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to switch organization")
+        const message = getApiErrorMessage(error, "Unable to switch organization")
+
+        if (message) {
+            toast.error(message)
+        }
     } finally {
         pending.value = false
     }
