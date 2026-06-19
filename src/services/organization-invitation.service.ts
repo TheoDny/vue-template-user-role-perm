@@ -1,8 +1,8 @@
 import { apiRequest } from "@/services/api.service"
 import type {
     CreateInvitationRequest,
+    InvitationOrgAndInviter,
     OrganizationInvitation,
-    PublicInvitation,
     UpdateInvitationRolesRequest,
 } from "@/types/organization-invitation.type"
 
@@ -48,6 +48,6 @@ export function rejectInvitation(invitationId: string) {
     })
 }
 
-export function getPublicInvitation(organizationId: string, invitationId: string) {
-    return apiRequest<PublicInvitation>(`/organizations/${organizationId}/invitations/${invitationId}`)
+export function getInvitation(invitationId: string) {
+    return apiRequest<InvitationOrgAndInviter>(`/invitations/${invitationId}`)
 }
