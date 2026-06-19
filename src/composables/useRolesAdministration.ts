@@ -1,4 +1,4 @@
-import { isApiError } from "@/services/api.service"
+import { showErrorToast } from "@/lib/utils"
 import {
     createRole,
     deleteRole,
@@ -15,7 +15,6 @@ import {
     updateRoleNameSchema,
     updateRolePermissionsSchema,
 } from "@/validators/role.schema"
-import { getZodErrorMessage } from "@/validators/validation"
 import { computed, ref } from "vue"
 import { toast } from "vue-sonner"
 
@@ -67,7 +66,7 @@ export function useRolesAdministration() {
                 selectedRoleKey.value = roles.value[0] ? getRoleKey(roles.value[0]) : null
             }
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to load roles")
+            showErrorToast(error, "Unable to load roles")
         } finally {
             loading.value = false
         }
@@ -83,7 +82,7 @@ export function useRolesAdministration() {
             selectedRoleKey.value = nextPayload.role
             toast.success("Role created")
         } catch (error) {
-            toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to create role"))
+            showErrorToast(error, "Unable to create role")
             throw error
         } finally {
             saving.value = false
@@ -100,7 +99,7 @@ export function useRolesAdministration() {
             await refresh()
             toast.success("Role renamed")
         } catch (error) {
-            toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to rename role"))
+            showErrorToast(error, "Unable to rename role")
             throw error
         } finally {
             saving.value = false
@@ -117,9 +116,7 @@ export function useRolesAdministration() {
             await refresh()
             toast.success("Role permissions updated")
         } catch (error) {
-            toast.error(
-                getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to update role permissions"),
-            )
+            showErrorToast(error, "Unable to update role permissions")
             throw error
         } finally {
             saving.value = false
@@ -134,7 +131,7 @@ export function useRolesAdministration() {
             await refresh()
             toast.success("Role deleted")
         } catch (error) {
-            toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to delete role"))
+            showErrorToast(error, "Unable to delete role")
             throw error
         } finally {
             saving.value = false

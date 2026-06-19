@@ -1,5 +1,5 @@
 import { parseRoleList, toUniqueRoles } from "@/lib/roles"
-import { isApiError } from "@/services/api.service"
+import { showErrorToast } from "@/lib/utils"
 import {
     cancelInvitation,
     createInvitation,
@@ -14,7 +14,6 @@ import {
     invitationIdSchema,
     updateInvitationRolesSchema,
 } from "@/validators/invitation.schema"
-import { getZodErrorMessage } from "@/validators/validation"
 import { computed, ref } from "vue"
 import { toast } from "vue-sonner"
 
@@ -49,7 +48,7 @@ export function useInvitationsAdministration() {
                 selectedInvitationId.value = invitations.value[0]?.id ?? null
             }
         } catch (error) {
-            toast.error(isApiError(error) ? error.message : "Unable to load invitations")
+            showErrorToast(error, "Unable to load invitations")
         } finally {
             loading.value = false
         }
@@ -64,7 +63,7 @@ export function useInvitationsAdministration() {
             await refresh()
             toast.success("Invitation created")
         } catch (error) {
-            toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to create invitation"))
+            showErrorToast(error, "Unable to create invitation")
             throw error
         } finally {
             saving.value = false
@@ -78,7 +77,7 @@ export function useInvitationsAdministration() {
             await refresh()
             toast.success("Invitation resent")
         } catch (error) {
-            toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to resend invitation"))
+            showErrorToast(error, "Unable to resend invitation")
             throw error
         } finally {
             saving.value = false
@@ -95,9 +94,7 @@ export function useInvitationsAdministration() {
             await refresh()
             toast.success("Invitation roles updated")
         } catch (error) {
-            toast.error(
-                getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to update invitation roles"),
-            )
+            showErrorToast(error, "Unable to update invitation roles")
             throw error
         } finally {
             saving.value = false
@@ -112,7 +109,7 @@ export function useInvitationsAdministration() {
             await refresh()
             toast.success("Invitation canceled")
         } catch (error) {
-            toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to cancel invitation"))
+            showErrorToast(error, "Unable to cancel invitation")
             throw error
         } finally {
             saving.value = false

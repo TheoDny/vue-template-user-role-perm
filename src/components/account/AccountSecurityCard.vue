@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
-import { toast } from "vue-sonner"
-import { MailCheck, Save } from "@lucide/vue"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
-import { isApiError } from "@/services/api.service"
+import { showErrorToast } from "@/lib/utils"
 import { requestPasswordResetEmailOtp, resetPasswordEmailOtp } from "@/services/auth.service"
 import { useSessionStore } from "@/stores/session.store"
 import { requestPasswordResetEmailOtpSchema, resetPasswordEmailOtpSchema } from "@/validators/auth.schema"
-import { getZodErrorMessage } from "@/validators/validation"
+import { MailCheck, Save } from "@lucide/vue"
+import { computed, ref } from "vue"
+import { toast } from "vue-sonner"
 
 const sessionStore = useSessionStore()
 const otpSent = ref(false)
@@ -26,6 +25,7 @@ const canSubmitPassword = computed(
     () => otpSent.value && otpCode.value.length === 6 && newPassword.value.length >= 8 && passwordsMatch.value,
 )
 
+
 async function handleSendOtp() {
     if (!email.value) {
         return
@@ -39,9 +39,7 @@ async function handleSendOtp() {
         otpSent.value = true
         toast.success("Verification code sent")
     } catch (error) {
-        toast.error(
-            getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to send verification code"),
-        )
+        showErrorToast(error, "Unable to send verification code")
     } finally {
         pending.value = false
     }
@@ -67,7 +65,7 @@ async function handleResetPassword() {
         otpSent.value = false
         toast.success("Password updated")
     } catch (error) {
-        toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to update password"))
+        showErrorToast(error, "Unable to update password")
     } finally {
         pending.value = false
     }
