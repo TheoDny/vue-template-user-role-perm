@@ -16,6 +16,8 @@ import {
 } from "@/services/organization-invitation.service"
 import { useSessionStore } from "@/stores/session.store"
 import type { PublicInvitation } from "@/types/organization-invitation.type"
+import { invitationIdSchema, publicInvitationParamsSchema } from "@/validators/invitation.schema"
+import { getZodErrorMessage } from "@/validators/validation"
 
 const route = useRoute()
 const router = useRouter()
@@ -93,7 +95,11 @@ async function resolveInvitationDetails() {
 
         for (const candidateOrganizationId of candidateOrganizationIds) {
             try {
-                invitation.value = await getPublicInvitation(candidateOrganizationId, invitationId.value)
+                const params = publicInvitationParamsSchema.parse({
+                    organizationId: candidateOrganizationId,
+                    invitationId: invitationId.value,
+                })
+                invitation.value = await getPublicInvitation(params.organizationId, params.invitationId)
                 return
             } catch (error) {
                 if (!isApiError(error) || error.status !== 404) {
@@ -105,7 +111,9 @@ async function resolveInvitationDetails() {
         resolutionFailed.value = true
     } catch (error) {
         resolutionFailed.value = true
-        toast.error(isApiError(error) ? error.message : "Unable to load invitation details")
+        toast.error(
+            getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to load invitation details"),
+        )
     } finally {
         resolvingInvitation.value = false
     }
@@ -115,12 +123,12 @@ async function handleAccept() {
     pendingAction.value = "accept"
 
     try {
-        await acceptInvitation(invitationId.value)
+        await acceptInvitation(invitationIdSchema.parse(invitationId.value))
         completedAction.value = "accepted"
         toast.success("Invitation accepted")
         await sessionStore.refreshSession()
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to accept invitation")
+        toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to accept invitation"))
     } finally {
         pendingAction.value = null
     }
@@ -130,11 +138,11 @@ async function handleReject() {
     pendingAction.value = "reject"
 
     try {
-        await rejectInvitation(invitationId.value)
+        await rejectInvitation(invitationIdSchema.parse(invitationId.value))
         completedAction.value = "rejected"
         toast.success("Invitation rejected")
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to reject invitation")
+        toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to reject invitation"))
     } finally {
         pendingAction.value = null
     }

@@ -10,6 +10,8 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { isApiError } from "@/services/api.service"
 import { requestPasswordResetEmailOtp, resetPasswordEmailOtp } from "@/services/auth.service"
 import { useSessionStore } from "@/stores/session.store"
+import { requestPasswordResetEmailOtpSchema, resetPasswordEmailOtpSchema } from "@/validators/auth.schema"
+import { getZodErrorMessage } from "@/validators/validation"
 
 const sessionStore = useSessionStore()
 const otpSent = ref(false)
@@ -32,11 +34,14 @@ async function handleSendOtp() {
     pending.value = true
 
     try {
-        await requestPasswordResetEmailOtp({ email: email.value })
+        const payload = requestPasswordResetEmailOtpSchema.parse({ email: email.value })
+        await requestPasswordResetEmailOtp(payload)
         otpSent.value = true
         toast.success("Verification code sent")
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to send verification code")
+        toast.error(
+            getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to send verification code"),
+        )
     } finally {
         pending.value = false
     }
@@ -50,18 +55,19 @@ async function handleResetPassword() {
     pending.value = true
 
     try {
-        await resetPasswordEmailOtp({
+        const payload = resetPasswordEmailOtpSchema.parse({
             email: email.value,
             otp: otpCode.value,
             password: newPassword.value,
         })
+        await resetPasswordEmailOtp(payload)
         otpCode.value = ""
         newPassword.value = ""
         confirmPassword.value = ""
         otpSent.value = false
         toast.success("Password updated")
     } catch (error) {
-        toast.error(isApiError(error) ? error.message : "Unable to update password")
+        toast.error(getZodErrorMessage(error) ?? (isApiError(error) ? error.message : "Unable to update password"))
     } finally {
         pending.value = false
     }
