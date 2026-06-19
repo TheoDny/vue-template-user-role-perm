@@ -35,7 +35,6 @@ Required environment values:
 ```env
 VITE_APP_NAME="Template User Role Perm"
 VITE_API_BASE_URL=http://localhost:3000
-VITE_BETTER_AUTH_BASE_PATH=/api/auth
 ```
 
 `VITE_API_BASE_URL` is used by the shared API client for Nest routes such as `/auth/session`, `/roles`, `/members`, and `/invitations`.
