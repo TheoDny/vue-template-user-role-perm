@@ -1,0 +1,14 @@
+node_modules
+dist
+build
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.cursor
+graft
+*.log
+README.md
+docs
+AGENTS.md
