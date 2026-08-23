@@ -9,4 +9,10 @@ services:
         container_name: vue_template_user_role_perm_web
         restart: unless-stopped
         ports:
-            - "${WEB_PORT_HOST:-5173}:80"
+            - "${HOST_PORT:-5173}:80"
+        healthcheck:
+            test: ["CMD", "wget", "-qO-", "http://localhost:80"]
+            interval: 1m
+            timeout: 10s
+            retries: 3
+            start_period: 30s
