@@ -14,7 +14,7 @@ D:\Documents\projets\test\nest-template-user-role-perm-better-auth
 
 ## Core Rules
 
-- Use `pnpm`.
+- Use `bun`.
 - Keep implementation code, comments, branch names, and commit messages in English.
 - Prefer small, focused changes.
 - Do not revert user changes unless explicitly asked.
@@ -29,15 +29,15 @@ D:\Documents\projets\test\nest-template-user-role-perm-better-auth
 ## Commands
 
 ```bash
-pnpm install
-pnpm dev
-pnpm build
-pnpm preview
+bun install
+bun dev
+bun run build
+bun preview
 ```
 
-Use `pnpm build` as the default verification command. It runs TypeScript checking and Vite production build.
+Use `bun run build` as the default verification command. It runs TypeScript checking and Vite production build.
 
-After running `pnpm build`, restore `tsconfig.tsbuildinfo` if it appears in the diff:
+After running `bun run build`, restore `tsconfig.tsbuildinfo` if it appears in the diff:
 
 ```bash
 git restore -- tsconfig.tsbuildinfo
@@ -332,6 +332,32 @@ Tailwind is configured through the Vite plugin and CSS variables. There is no se
 
 Do not create another global CSS file for theme tokens.
 
+## Docker
+
+The production image is built with Bun and serves the compiled SPA with `docker/serve.ts`.
+
+```bash
+docker compose up -d --build
+```
+
+Build-time args:
+
+- `VITE_APP_NAME`
+- `VITE_API_BASE_URL`
+
+Runtime:
+
+- container port `80`
+- host port from `HOST_PORT` (default `5173`)
+
+The Docker build uses a multi-stage `Dockerfile`:
+
+1. `deps` — `bun install --frozen-lockfile`
+2. `build` — `bun run build`
+3. `production` — Bun static server for `dist/`
+
+`docker/serve.ts` handles static assets, gzip, cache headers for hashed assets, and SPA fallback to `index.html`.
+
 ## Git Workflow
 
 Default workflow:
@@ -339,7 +365,7 @@ Default workflow:
 ```bash
 git status --short --branch
 git switch -c feature/<short-description>
-pnpm build
+bun run build
 ```
 
 Keep feature branches named `feature/...` unless the user asks otherwise.
@@ -348,7 +374,7 @@ Keep feature branches named `feature/...` unless the user asks otherwise.
 
 Before final response:
 
-- Run `pnpm build` when code or docs that affect imports/metadata changed.
+- Run `bun run build` when code or docs that affect imports/metadata changed.
 - Confirm `git status --short --branch`.
 - Restore generated `tsconfig.tsbuildinfo` if needed.
 - Mention skipped checks clearly.

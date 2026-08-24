@@ -13,14 +13,14 @@ Vue 3 administration interface for a NestJS Better Auth API with organization-sc
 - shadcn-vue / Reka UI components
 - lucide-vue icons
 - vue-sonner toasts
-- pnpm
+- Bun
 
 ## Setup
 
 ```bash
-pnpm install
+bun install
 cp .env.example .env
-pnpm dev
+bun dev
 ```
 
 Default local URLs:
@@ -44,12 +44,40 @@ VITE_API_BASE_URL=http://localhost:3000
 ## Commands
 
 ```bash
-pnpm dev
-pnpm build
-pnpm preview
+bun dev
+bun run build
+bun preview
 ```
 
-`pnpm build` runs `vue-tsc -b` and then `vite build`.
+`bun run build` runs `vue-tsc -b` and then `vite build`.
+
+## Docker
+
+Production is containerized with Bun:
+
+```bash
+docker compose up -d --build
+```
+
+The image:
+
+- installs dependencies with `bun install --frozen-lockfile`
+- builds the SPA with `bun run build`
+- serves `dist/` with `docker/serve.ts` (static files, gzip, SPA fallback)
+
+Useful environment variables:
+
+```env
+HOST_PORT=5173
+VITE_APP_NAME="Template User Role Perm"
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+Default container URL:
+
+```text
+http://localhost:5173
+```
 
 ## Features
 
@@ -218,7 +246,7 @@ If details cannot be resolved, the user can still attempt accept or reject with 
 Before handing off changes, run:
 
 ```bash
-pnpm build
+bun run build
 ```
 
 There is no dedicated test runner configured in this frontend yet. Recommended future coverage:
