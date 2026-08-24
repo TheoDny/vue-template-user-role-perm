@@ -6,3 +6,6 @@ node_modules
 /node_modules
 vite.out.log
 vite.err.log
+.cursor
+
+/graft/
